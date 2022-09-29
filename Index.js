@@ -1,4 +1,6 @@
 var seneca = require("seneca")();
+var product = seneca.use("products");
+product.use("seneca-entity");
 
 // Varriable for get,post and delete count
 var getCount = 0;
@@ -7,18 +9,33 @@ var deleteCount = 0;
 
 //adding pattern for GET api
 seneca.add("role:get,cmd:products", (args, done) => {
-  console.log(args.method);
-  done(null, { K: "Successg" });
+  product.act({ role: "product", cmd: "get" }, (err, msg) => {
+    done(null, { Products: msg });
+  });
 });
 //pattern for Post api
 seneca.add("role:post,cmd:products", (args, done) => {
-  console.log(args.method);
-  done(null, { K: "Successp" });
+  product.act(
+    {
+      role: "product",
+      cmd: "add",
+      data: {
+        productName: args.productName,
+        price: args.price,
+        category: args.category,
+      },
+    },
+    (err, msg) => {
+      done(null, { Products: msg });
+    }
+  );
 });
-//adding pattern for delete api
+//pattern for delete api
 seneca.add("role:delete,cmd:products", (args, done) => {
-  console.log(args.method);
-  done(null, { K: "Successd" });
+  product.act({ role: "product", cmd: "delete" }, (err, msg) => {
+    if (err) done(null, "Occur error while deleting");
+    if (!msg) done(null, msg);
+  });
 });
 
 // act for GET request
