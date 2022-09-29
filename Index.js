@@ -1,5 +1,10 @@
 var seneca = require("seneca")();
 
+// Varriable for get,post and delete count
+var getCount = 0;
+var postCount = 0;
+var deleteCount = 0;
+
 //pattern for GET API
 seneca.add("role:get,cmd:products", (args, done) => {
   done(null, { K: "Successg" });
@@ -40,9 +45,27 @@ seneca.act("role:web", {
   },
 });
 
+//middleware to count post and Get request
+function countRequest(req, res, next) {
+  if (req.method === "GET") getCount++;
+  else if (req.method === "POST") postCount++;
+  else if (req.method === "DELETE") deleteCount++;
+
+  console.log("Number of GET request " + getCount);
+  console.log("Number of POST request " + postCount);
+  console.log("Number of DELETE request " + deleteCount);
+  if (next) next();
+}
+
 //configuration of express framework
 var express = require("express");
 var app = express();
+
+//added middleware to count request according to it's type
+app.use(countRequest);
+
+// to parser request
+app.use(require("body-parser").json());
 
 app.use(seneca.export("web"));
 
