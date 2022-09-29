@@ -5,22 +5,23 @@ var getCount = 0;
 var postCount = 0;
 var deleteCount = 0;
 
-//pattern for GET API
+//adding pattern for GET api
 seneca.add("role:get,cmd:products", (args, done) => {
+  console.log(args.method);
   done(null, { K: "Successg" });
 });
-
-//pattern for POST API
+//pattern for Post api
 seneca.add("role:post,cmd:products", (args, done) => {
+  console.log(args.method);
   done(null, { K: "Successp" });
 });
-
-//adding pattern for DELETE API
+//adding pattern for delete api
 seneca.add("role:delete,cmd:products", (args, done) => {
+  console.log(args.method);
   done(null, { K: "Successd" });
 });
 
-// act to redirect api request to matching pattern
+// act for GET request
 seneca.act("role:web", {
   use: {
     prefix: "",
@@ -29,18 +30,26 @@ seneca.act("role:web", {
       products: { GET: true },
     },
   },
-  use: {
-    prefix: "",
-    pin: { role: "delete", cmd: "*" },
-    map: {
-      products: { DELETE: true },
-    },
-  },
+});
+
+// act for POST request
+seneca.act("role:web", {
   use: {
     prefix: "",
     pin: { role: "post", cmd: "*" },
     map: {
       products: { POST: true },
+    },
+  },
+});
+
+// act for DELETE request
+seneca.act("role:web", {
+  use: {
+    prefix: "",
+    pin: { role: "delete", cmd: "*" },
+    map: {
+      products: { DELETE: true },
     },
   },
 });
@@ -69,4 +78,5 @@ app.use(require("body-parser").json());
 
 app.use(seneca.export("web"));
 
+// Define listening port
 app.listen(3009);
