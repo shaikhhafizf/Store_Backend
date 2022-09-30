@@ -12,6 +12,15 @@ module.exports = function (options) {
 
   //for deleting all products
   this.add({ role: "product", cmd: "delete" }, (msg, res) => {
-    this.make("product").remove$({}, res);
+    this.make("product").list$({}, (err, list) => {
+      if (list.length > 0) {
+        for (var i = 1; i < list.length; i++) {
+          this.make("product").remove$({}, () => {});
+        }
+        this.make("product").remove$({}, res);
+      } else {
+        this.make("product").remove$({}, res);
+      }
+    });
   });
 };
